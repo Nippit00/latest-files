@@ -11,7 +11,7 @@ COPY package.json .
 RUN npm install
 
 # Rebuild native modules like bcrypt
-#RUN npm rebuild bcrypt --build-from-source
+RUN npm rebuild bcrypt --build-from-source
 
 # Copy the rest of the application code to the working directory
 COPY . .
