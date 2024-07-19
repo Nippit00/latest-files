@@ -3,52 +3,40 @@ version: '3.8'
 services:
   app:
     build: .
-    container_name: your-app-container
+    container_name: website
+    #working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
     ports:
       - "8888:8888"
     depends_on:
-      - db
-    environment:
-      DB_HOST: db
-      DB_USER: depa
-      DB_PASSWORD: depa@1234
-      DB_DATABASE: EvaluationSheet
+      - db_depa
 
-  db:
-    image: mysql:8
-    container_name: mysql-container
+  db_depa:
+    image: mysql:latest
+    container_name: db_depa
     restart: always
     volumes:
       - mysql-data:/var/lib/mysql
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
-      MYSQL_ROOT_PASSWORD: depa@1234
-      MYSQL_DATABASE: EvaluationSheet
-      MYSQL_USER: depa
-      MYSQL_PASSWORD: depa@1234
+      MYSQL_ROOT_PASSWORD: "MYSQL_ROOT_PASSWORD"
+      MYSQL_DATABASE: "EvaluationSheet"
+      MYSQL_USER: "MYSQL_USER"
+      MYSQL_PASSWORD: "MYSQL_PASSWORD"
     ports:
       - "3306:3306"
-    command: --default-authentication-plugin=mysql_native_password
-    healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -u root -pdepa@1234"]
-      interval: 10s
-      timeout: 10s
-      retries: 5
-      start_period: 30s
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    container_name: phpmyadmin-container
+    container_name: phpmyadmin-containers
+    restart: always
     environment:
-      PMA_HOST: db
-      PMA_USER: root
-      PMA_PASSWORD: depa@1234
+      PMA_HOST: db_depa
+      PMA_PORT: "3306"
     ports:
       - "80:80"
     depends_on:
-      - db
+      - db_depa
 
 volumes:
   mysql-data:
