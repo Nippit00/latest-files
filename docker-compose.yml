@@ -4,27 +4,36 @@ services:
   app:
     build: .
     container_name: website
-    #working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
     ports:
       - "8888:8888"
     depends_on:
       - db_depa
+    networks:
+      - webnet
+    environment:
+      DB_HOST: 'db_depa'
+      DB_USER: 'root'
+      DB_PASSWORD: 'MYSQL_ROOT_PASSWORD'
+      DB_DATABASE: 'EvaluationSheet'
+      PORT: 8888
 
   db_depa:
-    image: mysql:latest
+    image: mysql:8
     container_name: db_depa
     restart: always
     volumes:
       - mysql-data:/var/lib/mysql
     environment:
-      MYSQL_ROOT_PASSWORD: "MYSQL_ROOT_PASSWORD"
-      MYSQL_DATABASE: "EvaluationSheet"
-      MYSQL_USER: "MYSQL_USER"
-      MYSQL_PASSWORD: "MYSQL_PASSWORD"
+      MYSQL_ROOT_PASSWORD: 'MYSQL_ROOT_PASSWORD'
+      MYSQL_DATABASE: 'EvaluationSheet'
+      MYSQL_USER: 'MYSQL_USER'
+      MYSQL_PASSWORD: 'MYSQL_PASSWORD'
     ports:
       - "3306:3306"
+    networks:
+      - webnet
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -37,6 +46,11 @@ services:
       - "80:80"
     depends_on:
       - db_depa
+    networks:
+      - webnet
 
 volumes:
   mysql-data:
+
+networks:
+  webnet:
