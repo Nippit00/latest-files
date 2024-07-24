@@ -1,26 +1,22 @@
 const mysql = require('mysql');
 
-const connectionConfig = {
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD ,
-  database: process.env.DB_NAME || 'EvaluationSheet',
-};
+// Create a connection pool
+const pool = mysql.createPool({
+  connectionLimit: 10,
+  host: process.env.DB_HOST || 'db_depa', // Use the service name
+  user: process.env.DB_USER || 'MYSQL_USER',
+  password: process.env.DB_PASSWORD || 'MYSQL_PASSWORD',
+  database: process.env.DB_DATABASE || 'EvaluationSheet'
+});
 
-const connectWithRetry = () => {
-  const connection = mysql.createConnection(connectionConfig);
-  connection.connect((error) => {
-    if (error) {
-      console.error('Error connecting to database:', error);
-      setTimeout(connectWithRetry, 5000); // Retry after 5 seconds
-    } else {
-      console.log('Connected to database');
+function queryDatabase(sql, params, callback) {
+  pool.query(sql, params, (err, results) => {
+    if (err) {
+      console.error('Query error:', err);
+      return callback(err);
     }
+    callback(null, results);
   });
+}
 
-  return connection;
-};
-
-const connection = connectWithRetry();
-
-module.exports = connection;
+module.exports = { queryDatabase };
